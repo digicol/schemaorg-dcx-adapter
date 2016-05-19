@@ -1,0 +1,65 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "e8c01648b88dc715fbc4c74d81df65b2",
+    "content-hash": "ca916ca7c72babce886083a265066b1b",
+    "packages": [
+        {
+            "name": "digicol/schemaorg-sdk",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/digicol/schemaorg-sdk.git",
+                "reference": "f1e0ef227bfef953b7a3fd1868214ff498de0648"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/digicol/schemaorg-sdk/zipball/f1e0ef227bfef953b7a3fd1868214ff498de0648",
+                "reference": "f1e0ef227bfef953b7a3fd1868214ff498de0648",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Digicol\\SchemaOrg\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Digital Collections Verlagsgesellschaft mbH",
+                    "email": "dev@digicol.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Digital Collections inofficial schema.org PHP SDK",
+            "homepage": "http://ww.digicol.de/",
+            "keywords": [
+                "schemaorg"
+            ],
+            "support": {
+                "source": "https://github.com/digicol/schemaorg-sdk/tree/master",
+                "issues": "https://github.com/digicol/schemaorg-sdk/issues"
+            },
+            "time": "2016-05-18 15:13:14"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "digicol/schemaorg-sdk": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
