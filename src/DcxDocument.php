@@ -26,8 +26,37 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
      */
     public function getType()
     {
-        // TODO: Use Type tagdef
-        return 'CreativeWork';
+        $this->load();
+        
+        $type_map =
+            [
+                'documenttype-audio' => 'AudioObject',
+                'documenttype-desktop_publishing' => 'MediaObject',
+                'documenttype-email' => 'EmailMessage',
+                'documenttype-illustrator' => 'MediaObject',
+                'documenttype-image' => 'ImageObject',
+                'documenttype-office_text' => 'MediaObject',
+                'documenttype-pdf' => 'MediaObject',
+                'documenttype-postscript' => 'MediaObject',
+                'documenttype-presentation' => 'MediaObject',
+                'documenttype-spreadsheet' => 'MediaObject',
+                'documenttype-story' => 'Article',
+                'documenttype-text' => 'Article',
+                'documenttype-video' => 'VideoObject'
+            ];
+        
+        if (isset($this->params[ 'data' ][ 'fields' ][ 'Type' ][ 0 ][ '_id' ]))
+        {
+            // "dcxapi:tm_topic/documenttype-image" => "documenttype-image"
+            list(, $type_key) = explode('/', $this->params[ 'data' ][ 'fields' ][ 'Type' ][ 0 ][ '_id' ]);
+            
+            if (isset($type_map[ $type_key ]))
+            {
+                return $type_map[ $type_key ];
+            }
+        }
+        
+        return 'Thing';
     }
 
 
@@ -38,35 +67,78 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
      */
     public function getProperties()
     {
-        if (empty($this->params[ 'data' ]))
-        {
-            // TODO: Add error handling
-            $this->loadDetails($this->params['sameAs']);
-        }
+        $this->load();
         
         $data = $this->params[ 'data' ];
         
+        // Core properties
+        
         $result =
             [
-                'name' => $data[ 'fields' ][ '_display_title' ][ 0 ][ 'value' ],
-                'description' => '',
-                'sameAs' => $data[ '_id' ]
+                'name' => [ [ '@value' => $data[ 'fields' ][ '_display_title' ][ 0 ][ 'value' ] ] ],
+                'sameAs' => [ [ '@id' => $data[ '_id' ] ] ]
             ];
 
-        // TODO: How to handle xml:lang, datatype (HTML, datetime) in schema.org JSON-LD?
+        // Body text depends on type
+
+        if (! empty($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]))
+        {
+            $type = $this->getType();
+            
+            $body_map =
+                [
+                    'Article' => 'articleBody',
+                    'ImageObject' => 'caption',
+                    'NewsArticle' => 'articleBody',
+                    'VideoObject' => 'caption'
+                ];
+        
+            if (isset($body_map[ $type ]))
+            {
+                $body_property = $body_map[ $type ]; 
+            }
+            else
+            {
+                $body_property = 'description';
+            }
+            
+            $body_value =
+                [
+                    '@value' => $data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]
+                ];
+            
+            if ($data[ 'fields' ][ 'body' ][ 0 ][ '_type' ] === 'xhtml')
+            {
+                $body_value[ '@type' ] = 'http://www.w3.org/1999/xhtml';
+            }
+            
+            $result[ $body_property ] = [ $body_value ];
+        }
 
         if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'thumbnail' ]))
         {
             $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'thumbnail' ];
             $file_id = $data[ 'files' ][ $key ][ '_id' ];
 
-            $result[ 'image' ] = $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ];
+            $result[ 'image' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
         }
 
         return $result;
     }
 
 
+    protected function load()
+    {
+        if (! empty($this->params[ 'data' ]))
+        {
+            return 0;
+        }
+
+        // TODO: Add error handling
+        return $this->loadDetails($this->params['sameAs']);
+    }
+    
+    
     protected function loadDetails($uri)
     {
         $dcx_api = $this->adapter->newDcxApi();
@@ -89,7 +161,6 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             $api_obj,
             $this->params[ 'data' ]
         );
-        error_log(print_r($this->params[ 'data' ], true));
         
         return $ok;
     }
