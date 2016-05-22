@@ -101,6 +101,8 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                 'sameAs' => [ [ '@id' => $data[ '_id' ] ] ]
             ];
 
+        // DateCreated => dateCreated
+        
         // Body text depends on type
 
         if (! empty($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]))
@@ -145,10 +147,60 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             $result[ 'image' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
         }
 
+        if (isset($data['_highlighting']))
+        {
+            // TODO: Standardize to schema.org? At least map to schema.org field names 
+            $result['dcx:_highlighting'] = $data['_highlighting']; 
+        }
+        
         return $result;
     }
 
 
+    /**
+     * @return array
+     */
+    public function getReconciledProperties()
+    {
+        $properties = $this->getProperties();
+        
+        $result = \Digicol\SchemaOrg\Utils::reconcileThingProperties
+        (
+            $this->getType(),
+            $properties
+        );
+        
+        // Apply highlighting
+        // TODO: Does it make sense to overwrite the name with highlighted stuff?
+        // Are we sure no-one uses this for updates?
+        // TODO: Standardize field names to schema.org?
+        // TODO: Do it like \DCX_Document::getDisplayTitleTag()
+        
+        foreach (['Headline', 'Title', 'Filename'] as $tag)
+        {
+            if (empty($properties['dcx:_highlighting'][$tag][0]))
+            {
+                continue;
+            }
+            
+            $result['name'][0]['@value'] = strtr
+            (
+                htmlspecialchars($properties['dcx:_highlighting'][$tag][0]),
+                [
+                    '~[' => '<mark>',
+                    ']~' => '</mark>'
+                ]
+            );
+
+            $result['name'][0]['@type'] = 'http://www.w3.org/1999/xhtml';
+            
+            break;
+        }
+        
+        return $result;
+    }
+
+    
     protected function load()
     {
         if (! empty($this->params[ 'data' ]))

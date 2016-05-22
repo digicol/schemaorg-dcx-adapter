@@ -27,6 +27,28 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
     }
 
 
+    /**
+     * Get item type
+     *
+     * @return string schema.org type like "ImageObject" or "Thing"
+     */
+    public function getType()
+    {
+        return 'SearchAction';
+    }
+
+
+    /**
+     * Get identifier URI
+     *
+     * @return string
+     */
+    public function getSameAs()
+    {
+        return '';
+    }
+
+
     /** @return array */
     public function getParams()
     {
@@ -61,23 +83,22 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /**
+     * Get search parameters
+     *
+     * @return array
+     */
+    public function getInputProperties()
+    {
+        return $this->input_properties;
+    }
+
+
+    /**
      * @return int
      */
     public function execute()
     {
-        if (! empty($this->input_properties['q']))
-        {
-            $fulltext = $this->input_properties['q'];
-        }
-        else
-        {
-            $fulltext = '';
-        }
-
-        $dcx_api = $this->adapter->newDcxApi();
-
-        $ok = $dcx_api->getObjects
-        (
+        $params =
             [
                 'object_type' => 'document',
                 's' =>
@@ -89,12 +110,37 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
                     ],
                 'query' =>
                     [
-                        'channel' => [ $this->params[ 'id' ] ],
-                        'fulltext' => [ $fulltext ],
+                        'channel' => [ $this->params['id'] ],
                         '_limit' => \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE),
                         '_offset' => (\Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE) - 1)
                     ]
-            ],
+            ];
+
+        if (! empty($this->input_properties['query']))
+        {
+            $params['query']['fulltext'] = [ $this->input_properties['query'] ];
+        }
+
+        if (isset($this->input_properties['dcx:filters']) && is_array($this->input_properties['dcx:filters']))
+        {
+            $params['query']['filters'] = $this->input_properties['dcx:filters'];
+        }
+
+        if (! empty($this->input_properties['dcx:request_filters']))
+        {
+            $params['query']['request_filters'] = $this->input_properties['dcx:request_filters'];
+        }
+
+        if (! empty($this->input_properties['dcx:request_highlighting']))
+        {
+            $params['query']['request_highlighting'] = $this->input_properties['dcx:request_highlighting'];
+        }
+
+        $dcx_api = $this->adapter->newDcxApi();
+
+        $ok = $dcx_api->getObjects
+        (
+            $params,
             $api_obj,
             $this->search_response
         );
@@ -104,22 +150,47 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /**
-     * Get search results
+     * Get all property values
      *
-     * @return array Array of objects implementing ThingInterface
+     * @return array
      */
-    public function getResult()
+    public function getProperties()
     {
-        $result = [ ];
+        $result = \Digicol\SchemaOrg\Utils::getSearchActionSkeleton();
 
-        if ((! is_array($this->search_response)) || (! isset($this->search_response[ 'entries' ])))
+        if ((! is_array($this->search_response)) || (! isset($this->search_response['entries'])))
         {
             return $result;
         }
 
-        foreach ($this->search_response[ 'entries' ] as $entry_data)
+        $result['query'] = (isset($this->input_properties['query']) ? $this->input_properties['query'] : '');
+
+        if (is_array($this->search_response) && isset($this->search_response['totalResults']))
         {
-            $result[ ] = new DcxDocument($this->adapter, [ 'data' => $entry_data ]);
+            $total_results = $this->search_response['totalResults'];
+        }
+        else
+        {
+            $total_results = 0;
+        }
+
+        $result['result']['numberOfItems'] = $total_results;
+        $result['result']['opensearch:itemsPerPage'] = \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE);
+        $result['result']['opensearch:startIndex'] = \Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE);
+
+        foreach ($this->search_response['entries'] as $i => $entry_data)
+        {
+            $result['result']['itemListElement'][] =
+                [
+                    '@type' => 'ListItem',
+                    'position' => ($i + 1),
+                    'item' => new DcxDocument($this->adapter, [ 'data' => $entry_data ])
+                ];
+        }
+
+        if (isset($this->search_response['_available_filters']))
+        {
+            $result['dcx:_available_filters'] = $this->search_response['_available_filters'];
         }
 
         return $result;
@@ -127,33 +198,14 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /**
-     * Get search result metadata
-     *
-     * The array should contain at least these three values:
-     *
-     *   opensearch:totalResults (int)
-     *   opensearch:startIndex (int; 1 for the first document)
-     *   opensearch:itemsPerPage (int)
-     *
      * @return array
      */
-    public function getResultMeta()
+    public function getReconciledProperties()
     {
-        if (is_array($this->search_response) && isset($this->search_response[ 'totalResults' ]))
-        {
-            $total_results = $this->search_response[ 'totalResults' ];
-        }
-        else
-        {
-            $total_results = 0;
-        }
-
-        return
-            [
-                'opensearch:totalResults' => $total_results,
-                'opensearch:startIndex' => \Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE),
-                'opensearch:itemsPerPage' => \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE)
-            ];
+        return \Digicol\SchemaOrg\Utils::reconcileThingProperties
+        (
+            $this->getType(),
+            $this->getProperties()
+        );
     }
-
 }
