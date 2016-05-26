@@ -28,6 +28,13 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /** @return array */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+
+    /** @return array */
     public function describeInputProperties()
     {
         return [ ];

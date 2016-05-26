@@ -25,6 +25,13 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
 
 
     /** @return array */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+
+    /** @return array */
     public function describeSearchActions()
     {
         $result = [ ];
