@@ -20,6 +20,28 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
 
 
     /**
+     * Get identifier URI
+     *
+     * @return string
+     */
+    public function getSameAs()
+    {
+        if (! empty($this->params[ 'data' ][ '_id' ]))
+        {
+            return $this->params[ 'data' ][ '_id' ];
+        }
+        elseif (! empty($this->params[ 'sameAs' ]))
+        {
+            return $this->params[ 'sameAs' ];
+        }
+        else
+        {
+            return '';
+        }
+    }
+
+
+    /**
      * Get item type
      *
      * @return string schema.org type like "ImageObject" or "Thing"
