@@ -58,7 +58,7 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
                 continue;
             }
 
-            $result[ ] =
+            $result[ $dcx_channel->getId() ] =
                 [
                     'name' => $dcx_channel->getLabel(),
                     'description' => $dcx_channel->getRemark(),
