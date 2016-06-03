@@ -132,7 +132,7 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
      */
     public function getProperties()
     {
-        $result = Digicol\SchemaOrg\Utils::getSearchActionSkeleton();
+        $result = \Digicol\SchemaOrg\Utils::getSearchActionSkeleton();
 
         if ((! is_array($this->search_response)) || (! isset($this->search_response[ 'entries' ])))
         {
