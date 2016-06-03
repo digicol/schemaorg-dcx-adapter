@@ -101,6 +101,8 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                 'sameAs' => [ [ '@id' => $data[ '_id' ] ] ]
             ];
 
+        // DateCreated => dateCreated
+        
         // Body text depends on type
 
         if (! empty($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]))

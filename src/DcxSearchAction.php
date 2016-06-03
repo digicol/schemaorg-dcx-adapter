@@ -27,6 +27,28 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
     }
 
 
+    /**
+     * Get item type
+     *
+     * @return string schema.org type like "ImageObject" or "Thing"
+     */
+    public function getType()
+    {
+        return 'SearchAction';
+    }
+
+
+    /**
+     * Get identifier URI
+     *
+     * @return string
+     */
+    public function getSameAs()
+    {
+        return '';
+    }
+
+
     /** @return array */
     public function getParams()
     {
@@ -104,41 +126,21 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /**
-     * Get search results
+     * Get all property values
      *
-     * @return array Array of objects implementing ThingInterface
+     * @return array
      */
-    public function getResult()
+    public function getProperties()
     {
-        $result = [ ];
+        $result = Digicol\SchemaOrg\Utils::getSearchActionSkeleton();
 
         if ((! is_array($this->search_response)) || (! isset($this->search_response[ 'entries' ])))
         {
             return $result;
         }
 
-        foreach ($this->search_response[ 'entries' ] as $entry_data)
-        {
-            $result[ ] = new DcxDocument($this->adapter, [ 'data' => $entry_data ]);
-        }
+        $result[ 'query' ] = (isset($this->input_properties['q']) ? $this->input_properties['q'] : '');
 
-        return $result;
-    }
-
-
-    /**
-     * Get search result metadata
-     *
-     * The array should contain at least these three values:
-     *
-     *   opensearch:totalResults (int)
-     *   opensearch:startIndex (int; 1 for the first document)
-     *   opensearch:itemsPerPage (int)
-     *
-     * @return array
-     */
-    public function getResultMeta()
-    {
         if (is_array($this->search_response) && isset($this->search_response[ 'totalResults' ]))
         {
             $total_results = $this->search_response[ 'totalResults' ];
@@ -148,12 +150,21 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
             $total_results = 0;
         }
 
-        return
-            [
-                'opensearch:totalResults' => $total_results,
-                'opensearch:startIndex' => \Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE),
-                'opensearch:itemsPerPage' => \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE)
-            ];
-    }
+        $result[ 'result' ][ 'numberOfItems' ] = $total_results;
+        $result[ 'result' ][ 'opensearch:itemsPerPage' ] = \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE);
+        $result[ 'result' ][ 'opensearch:startIndex' ] = \Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE);
 
+        foreach ($this->search_response[ 'entries' ] as $i => $entry_data)
+        {
+            $result[ 'result' ][ 'itemListElement' ][ ] =
+                [
+                    '@type' => 'ListItem',
+                    'position' => ($i + 1),
+                    'item' => new DcxDocument($this->adapter, [ 'data' => $entry_data ])
+                ];
+        }
+
+        return $result;
+    }
+    
 }
