@@ -87,19 +87,7 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
      */
     public function execute()
     {
-        if (! empty($this->input_properties['q']))
-        {
-            $fulltext = $this->input_properties['q'];
-        }
-        else
-        {
-            $fulltext = '';
-        }
-
-        $dcx_api = $this->adapter->newDcxApi();
-
-        $ok = $dcx_api->getObjects
-        (
+        $params = 
             [
                 'object_type' => 'document',
                 's' =>
@@ -112,11 +100,21 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
                 'query' =>
                     [
                         'channel' => [ $this->params[ 'id' ] ],
-                        'fulltext' => [ $fulltext ],
                         '_limit' => \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE),
                         '_offset' => (\Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE) - 1)
                     ]
-            ],
+            ];
+
+        if (! empty($this->input_properties['query']))
+        {
+            $params['query']['fulltext'] = [ $this->input_properties['query'] ];
+        }
+        
+        $dcx_api = $this->adapter->newDcxApi();
+
+        $ok = $dcx_api->getObjects
+        (
+            $params,
             $api_obj,
             $this->search_response
         );
@@ -139,7 +137,7 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
             return $result;
         }
 
-        $result[ 'query' ] = (isset($this->input_properties['q']) ? $this->input_properties['q'] : '');
+        $result[ 'query' ] = (isset($this->input_properties['query']) ? $this->input_properties['query'] : '');
 
         if (is_array($this->search_response) && isset($this->search_response[ 'totalResults' ]))
         {
