@@ -109,7 +109,12 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
         {
             $params['query']['fulltext'] = [ $this->input_properties['query'] ];
         }
-        
+
+        if (! empty($this->input_properties['dcx:request_filters']))
+        {
+            $params['query']['request_filters'] = $this->input_properties['dcx:request_filters'];
+        }
+
         $dcx_api = $this->adapter->newDcxApi();
 
         $ok = $dcx_api->getObjects
@@ -162,6 +167,11 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
                 ];
         }
 
+        if (isset($this->search_response[ '_available_filters' ]))
+        {
+            $result[ 'dcx:_available_filters' ] = $this->search_response[ '_available_filters' ]; 
+        }
+        
         return $result;
     }
     
