@@ -83,6 +83,17 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /**
+     * Get search parameters
+     *
+     * @return array
+     */
+    public function getInputProperties()
+    {
+        return $this->input_properties;
+    }
+
+
+    /**
      * @return int
      */
     public function execute()
@@ -108,6 +119,11 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
         if (! empty($this->input_properties['query']))
         {
             $params['query']['fulltext'] = [ $this->input_properties['query'] ];
+        }
+
+        if (isset($this->input_properties['dcx:filters']) && is_array($this->input_properties['dcx:filters']))
+        {
+            $params['query']['filters'] = $this->input_properties['dcx:filters'];
         }
 
         if (! empty($this->input_properties['dcx:request_filters']))
