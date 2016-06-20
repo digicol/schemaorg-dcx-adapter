@@ -174,19 +174,27 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         // TODO: Does it make sense to overwrite the name with highlighted stuff?
         // Are we sure no-one uses this for updates?
         // TODO: Standardize field names to schema.org?
+        // TODO: Do it like \DCX_Document::getDisplayTitleTag()
         
-        if (! empty($properties['dcx:_highlighting']['Title'][0]))
+        foreach (['Headline', 'Title', 'Filename'] as $tag)
         {
+            if (empty($properties['dcx:_highlighting'][$tag][0]))
+            {
+                continue;
+            }
+            
             $result['name'][0]['@value'] = strtr
             (
-                htmlspecialchars($properties['dcx:_highlighting']['Title'][0]),
+                htmlspecialchars($properties['dcx:_highlighting'][$tag][0]),
                 [
                     '~[' => '<mark>',
                     ']~' => '</mark>'
                 ]
             );
-            
+
             $result['name'][0]['@type'] = 'http://www.w3.org/1999/xhtml';
+            
+            break;
         }
         
         return $result;
