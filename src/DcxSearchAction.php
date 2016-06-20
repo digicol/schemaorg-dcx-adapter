@@ -98,7 +98,7 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
      */
     public function execute()
     {
-        $params = 
+        $params =
             [
                 'object_type' => 'document',
                 's' =>
@@ -110,7 +110,7 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
                     ],
                 'query' =>
                     [
-                        'channel' => [ $this->params[ 'id' ] ],
+                        'channel' => [ $this->params['id'] ],
                         '_limit' => \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE),
                         '_offset' => (\Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE) - 1)
                     ]
@@ -158,29 +158,29 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
     {
         $result = \Digicol\SchemaOrg\Utils::getSearchActionSkeleton();
 
-        if ((! is_array($this->search_response)) || (! isset($this->search_response[ 'entries' ])))
+        if ((! is_array($this->search_response)) || (! isset($this->search_response['entries'])))
         {
             return $result;
         }
 
-        $result[ 'query' ] = (isset($this->input_properties['query']) ? $this->input_properties['query'] : '');
+        $result['query'] = (isset($this->input_properties['query']) ? $this->input_properties['query'] : '');
 
-        if (is_array($this->search_response) && isset($this->search_response[ 'totalResults' ]))
+        if (is_array($this->search_response) && isset($this->search_response['totalResults']))
         {
-            $total_results = $this->search_response[ 'totalResults' ];
+            $total_results = $this->search_response['totalResults'];
         }
         else
         {
             $total_results = 0;
         }
 
-        $result[ 'result' ][ 'numberOfItems' ] = $total_results;
-        $result[ 'result' ][ 'opensearch:itemsPerPage' ] = \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE);
-        $result[ 'result' ][ 'opensearch:startIndex' ] = \Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE);
+        $result['result']['numberOfItems'] = $total_results;
+        $result['result']['opensearch:itemsPerPage'] = \Digicol\SchemaOrg\Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE);
+        $result['result']['opensearch:startIndex'] = \Digicol\SchemaOrg\Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE);
 
-        foreach ($this->search_response[ 'entries' ] as $i => $entry_data)
+        foreach ($this->search_response['entries'] as $i => $entry_data)
         {
-            $result[ 'result' ][ 'itemListElement' ][ ] =
+            $result['result']['itemListElement'][] =
                 [
                     '@type' => 'ListItem',
                     'position' => ($i + 1),
@@ -188,12 +188,24 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
                 ];
         }
 
-        if (isset($this->search_response[ '_available_filters' ]))
+        if (isset($this->search_response['_available_filters']))
         {
-            $result[ 'dcx:_available_filters' ] = $this->search_response[ '_available_filters' ]; 
+            $result['dcx:_available_filters'] = $this->search_response['_available_filters'];
         }
-        
+
         return $result;
     }
-    
+
+
+    /**
+     * @return array
+     */
+    public function getReconciledProperties()
+    {
+        return \Digicol\SchemaOrg\Utils::reconcileThingProperties
+        (
+            $this->getType(),
+            $this->getProperties()
+        );
+    }
 }
