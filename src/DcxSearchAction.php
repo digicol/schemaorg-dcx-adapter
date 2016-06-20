@@ -131,6 +131,11 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
             $params['query']['request_filters'] = $this->input_properties['dcx:request_filters'];
         }
 
+        if (! empty($this->input_properties['dcx:request_highlighting']))
+        {
+            $params['query']['request_highlighting'] = $this->input_properties['dcx:request_highlighting'];
+        }
+
         $dcx_api = $this->adapter->newDcxApi();
 
         $ok = $dcx_api->getObjects
