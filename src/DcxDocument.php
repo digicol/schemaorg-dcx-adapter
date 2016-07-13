@@ -123,7 +123,7 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             }
             else
             {
-                $body_property = 'description';
+                $body_property = 'text';
             }
             
             $body_value =
@@ -139,6 +139,33 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             $result[ $body_property ] = [ $body_value ];
         }
 
+        // Description (for search results) = body text, shortened
+
+        if (! empty($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]))
+        {
+            if ($data[ 'fields' ][ 'body' ][ 0 ][ '_type' ] === 'xhtml')
+            {
+                $body_text = DcxUtils::toPlainText($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]);
+            }
+            else
+            {
+                $body_text = $data[ 'fields' ][ 'body' ][ 0 ][ 'value' ];
+            }
+            
+            if (mb_strlen($body_text) > 500)
+            {
+                $short_text = mb_substr($body_text, 0, 500) . '…';
+            }
+            else
+            {
+                $short_text = $body_text;
+            }
+
+            $result[ 'description' ] = [ [ '@value' => $short_text ] ];
+        }
+        
+        // Files
+        
         if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'thumbnail' ]))
         {
             $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'thumbnail' ];
