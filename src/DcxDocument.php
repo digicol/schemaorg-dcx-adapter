@@ -101,7 +101,37 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                 'sameAs' => [ [ '@id' => $data[ '_id' ] ] ]
             ];
 
-        // DateCreated => dateCreated
+        // DateImported/DateCreated => dateCreated
+        
+        foreach ([ 'DateCreated', 'DateImported' ] as $tagdef)
+        {
+            if (! empty($data[ 'fields' ][ $tagdef ][ 0 ][ 'value' ]))
+            {
+                $result[ 'dateCreated' ] = [ ];
+                
+                foreach ($data[ 'fields' ][ $tagdef ] as $value)
+                {
+                    // Common DC-X hack - assume midnight means "just the date, no time"
+
+                    if (strpos($value[ 'value' ], 'T00:00:00') !== false)
+                    {
+                        $datatype = 'Date';
+                    }
+                    else
+                    {
+                        $datatype = 'DateTime';
+                    }
+
+                    $result[ 'dateCreated' ][ ] =
+                        [
+                            '@value' => $value[ 'value' ],
+                            '@type' => $datatype
+                        ];
+                }
+                
+                break;
+            }
+        }
         
         // Body text depends on type
 
