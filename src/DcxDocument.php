@@ -133,6 +133,16 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             }
         }
         
+        // dateModified
+        
+        $result[ 'dateModified' ] =
+            [
+                [
+                    '@value' => $data[ 'properties' ][ '_modified' ],
+                    '@type' => 'DateTime'
+                ]
+            ];
+        
         // Body text depends on type
 
         if (! empty($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]))
