@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digicol/schemaorg-sdk.git",
-                "reference": "61e107bc98f34b9136b6db8fb1d344228e00798a"
+                "reference": "7741c82c5d4703de9ad4e522bbeb61ad9fd48541"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digicol/schemaorg-sdk/zipball/61e107bc98f34b9136b6db8fb1d344228e00798a",
-                "reference": "61e107bc98f34b9136b6db8fb1d344228e00798a",
+                "url": "https://api.github.com/repos/digicol/schemaorg-sdk/zipball/7741c82c5d4703de9ad4e522bbeb61ad9fd48541",
+                "reference": "7741c82c5d4703de9ad4e522bbeb61ad9fd48541",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "source": "https://github.com/digicol/schemaorg-sdk/tree/master",
                 "issues": "https://github.com/digicol/schemaorg-sdk/issues"
             },
-            "time": "2016-07-13 14:15:53"
+            "time": "2016-08-02 14:10:41"
         }
     ],
     "packages-dev": [],

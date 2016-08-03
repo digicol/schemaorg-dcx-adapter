@@ -198,14 +198,15 @@ class DcxSearchAction implements \Digicol\SchemaOrg\SearchActionInterface
 
 
     /**
+     * @param array $properties
      * @return array
      */
-    public function getReconciledProperties()
+    public function getReconciledProperties(array $properties)
     {
         return \Digicol\SchemaOrg\Utils::reconcileThingProperties
         (
             $this->getType(),
-            $this->getProperties()
+            $properties
         );
     }
 }

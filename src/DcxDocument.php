@@ -97,6 +97,8 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         
         $result =
             [
+                '@context' => \Digicol\SchemaOrg\Utils::getNamespaceContext(),
+                '@type' => $this->getType(),
                 'name' => [ [ '@value' => $data[ 'fields' ][ '_display_title' ][ 0 ][ 'value' ] ] ],
                 'sameAs' => [ [ '@id' => $data[ '_id' ] ] ]
             ];
@@ -217,7 +219,7 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         if (isset($data['_highlighting']))
         {
             // TODO: Standardize to schema.org? At least map to schema.org field names 
-            $result['dcx:_highlighting'] = $data['_highlighting']; 
+            $result['digicol:_highlighting'] = $data['_highlighting']; 
         }
         
         return $result;
@@ -225,12 +227,11 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
 
 
     /**
+     * @param array $properties
      * @return array
      */
-    public function getReconciledProperties()
+    public function getReconciledProperties(array $properties)
     {
-        $properties = $this->getProperties();
-        
         $result = \Digicol\SchemaOrg\Utils::reconcileThingProperties
         (
             $this->getType(),
@@ -245,14 +246,14 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         
         foreach (['Headline', 'Title', 'Filename'] as $tag)
         {
-            if (empty($properties['dcx:_highlighting'][$tag][0]))
+            if (empty($properties['digicol:_highlighting'][$tag][0]))
             {
                 continue;
             }
             
             $result['name'][0]['@value'] = strtr
             (
-                htmlspecialchars($properties['dcx:_highlighting'][$tag][0]),
+                htmlspecialchars($properties['digicol:_highlighting'][$tag][0]),
                 [
                     '~[' => '<mark>',
                     ']~' => '</mark>'
