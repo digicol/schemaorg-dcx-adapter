@@ -144,6 +144,21 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                     '@type' => 'DateTime'
                 ]
             ];
+
+        // Provider/Source => provider
+
+        foreach ([ 'Provider', 'Source' ] as $tagdef)
+        {
+            if (! empty($data[ 'fields' ][ $tagdef ][ 0 ][ 'value' ]))
+            {
+                $result[ 'provider' ] = [ ];
+
+                foreach ($data[ 'fields' ][ $tagdef ] as $value)
+                {
+                    $result[ 'provider' ][ ] = [ '@value' => $value[ 'value' ] ];
+                }
+            }
+        }
         
         // Body text depends on type
 
