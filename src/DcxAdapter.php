@@ -33,6 +33,7 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
         
         $result['logged_in'] = $this->app->isLoggedIn();
         $result['login_url_pattern'] = $this->app->base_url . 'login?redirect=%s';
+        $result['logout_url_pattern'] = $this->app->base_url . 'login?logout=1&redirect=%s';
         
         return $result;
     }
@@ -66,21 +67,45 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
             }
 
             $dcx_api->getPage('searchform', $searchform);
-            
+
+            $order = $this->app->cache->getConfigValue('dcx_channel.order', $channel_id);
+
+            if (! is_numeric($order))
+            {
+                $order = 0;
+            }
+
             $result[ $dcx_channel->getId() ] =
                 [
                     'name' => $dcx_channel->getLabel(),
                     'description' => $dcx_channel->getRemark(),
+                    'order' => $order,
                     'type' => 'channel',
                     'id' => $dcx_channel->getId(),
                     'searchform' => $searchform
                 ];
         }
 
+        uasort($result, [ $this, 'channelSortCallback' ]);
+
         return $result;
     }
 
 
+    public function channelSortCallback($a, $b)
+    {
+        $a = $a['order'];
+        $b = $b['order'];
+
+        if ($a === $b)
+        {
+            return 0;
+        }
+        
+        return ($a > $b ? 1 : -1);
+    }
+    
+    
     /**
      * @param array $search_params
      * @return DcxSearchAction
