@@ -159,7 +159,27 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                 }
             }
         }
+
+        // Creator => creator
+
+        $map_tags = 
+            [
+                'Creator' => 'creator'
+            ];
         
+        foreach ($map_tags as $tagdef => $property)
+        {
+            if (! empty($data[ 'fields' ][ $tagdef ][ 0 ][ 'value' ]))
+            {
+                $result[ $property ] = [ ];
+
+                foreach ($data[ 'fields' ][ $tagdef ] as $value)
+                {
+                    $result[ $property ][ ] = [ '@value' => $value[ 'value' ] ];
+                }
+            }
+        }
+
         // Body text depends on type
 
         if (! empty($data[ 'fields' ][ 'body' ][ 0 ][ 'value' ]))
@@ -231,6 +251,16 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             $result[ 'image' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
         }
 
+        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'layout' ]))
+        {
+            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'layout' ];
+            $file_id = $data[ 'files' ][ $key ][ '_id' ];
+
+            $result[ 'digicol:previewImage' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
+        }
+
+        // Highlighting
+        
         if (isset($data['_highlighting']))
         {
             // TODO: Standardize to schema.org? At least map to schema.org field names 
