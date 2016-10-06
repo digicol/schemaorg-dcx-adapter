@@ -27,7 +27,14 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
     /** @return array */
     public function getParams()
     {
-        return $this->params;
+        $this->initDcx();
+        
+        $result = $this->params;
+        
+        $result['logged_in'] = $this->app->isLoggedIn();
+        $result['login_url_pattern'] = $this->app->base_url . 'login?redirect=%s';
+        
+        return $result;
     }
 
 
@@ -36,9 +43,9 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
     {
         $result = [ ];
 
-        $this->initDcx();
+        $dcx_api = $this->newDcxApi();
 
-        // TODO: Use DCX_Api instead
+        // TODO: Use DCX_Api navigation page instead
 
         $permitted_channel_ids = $this->app->user->getChannelsByPermDef('dcx_channel.show_in_menu');
 
@@ -58,12 +65,15 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
                 continue;
             }
 
+            $dcx_api->getPage('searchform', $searchform);
+            
             $result[ $dcx_channel->getId() ] =
                 [
                     'name' => $dcx_channel->getLabel(),
                     'description' => $dcx_channel->getRemark(),
                     'type' => 'channel',
-                    'id' => $dcx_channel->getId()
+                    'id' => $dcx_channel->getId(),
+                    'searchform' => $searchform
                 ];
         }
 
@@ -109,6 +119,11 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
     protected function initDcx()
     {
         global $app;
+
+        if (is_object($this->app))
+        {
+            return;
+        }
 
         putenv('DC_CONFIGDIR=' . $this->params[ 'dc_configdir' ]);
         putenv('DC_APP=' . $this->params[ 'dc_app' ]);
