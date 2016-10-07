@@ -115,7 +115,11 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                 {
                     // Common DC-X hack - assume midnight means "just the date, no time"
 
-                    if (strpos($value[ 'value' ], 'T00:00:00') !== false)
+                    if (! DcxUtils::isValidIso8601($value[ 'value' ]))
+                    {
+                        $datatype = 'Text';
+                    }
+                    elseif (strpos($value[ 'value' ], 'T00:00:00') !== false)
                     {
                         $datatype = 'Date';
                     }

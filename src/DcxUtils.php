@@ -76,4 +76,32 @@ class DcxUtils
 
         return html_entity_decode($html, ENT_QUOTES, 'UTF-8');
     }
+    
+    
+    public static function isValidIso8601($iso8601str)
+    {
+        // The string should parse into a valid date... 
+
+        try
+        {
+            $dummy = new \DateTime($iso8601str);
+        }
+        catch (\Exception $e)
+        {
+            return false;
+        }
+
+        // ... and match the expected format
+
+        return preg_match
+        (
+            '/^'
+            . '[0-9]{4}-[0-9]{2}-[0-9]{2}' // 2016-09-23
+            . 'T[0-9]{2}:[0-9]{2}:[0-9]{2}' // T17:38:02
+            . '(\\.[0-9]+)?' // .4312
+            . '(Z|(\\+|-)[0-9]{2}:[0-9]{2})' // Z, or +01:00
+            . '$/',
+            $iso8601str
+        );
+    }
 }
