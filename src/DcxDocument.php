@@ -260,7 +260,26 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'layout' ];
             $file_id = $data[ 'files' ][ $key ][ '_id' ];
 
+            // TODO: Should this be wrapped in a contentUrl?
             $result[ 'digicol:previewImage' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
+        }
+
+        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'webm' ]))
+        {
+            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'webm' ];
+            $file_id = $data[ 'files' ][ $key ][ '_id' ];
+
+            // TODO: Should this be wrapped in a contentUrl?
+            $result[ 'digicol:previewVideoWebM' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
+        }
+
+        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'mp4' ]))
+        {
+            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'mp4' ];
+            $file_id = $data[ 'files' ][ $key ][ '_id' ];
+
+            // TODO: Should this be wrapped in a contentUrl?
+            $result[ 'digicol:previewVideoMp4' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
         }
 
         // Highlighting
