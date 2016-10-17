@@ -52,19 +52,19 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         
         $type_map =
             [
-                'documenttype-audio' => 'AudioObject',
-                'documenttype-desktop_publishing' => 'MediaObject',
+                'documenttype-audio' => 'Clip',
+                'documenttype-desktop_publishing' => 'DigitalDocument',
                 'documenttype-email' => 'EmailMessage',
-                'documenttype-illustrator' => 'MediaObject',
-                'documenttype-image' => 'ImageObject',
-                'documenttype-office_text' => 'MediaObject',
-                'documenttype-pdf' => 'MediaObject',
-                'documenttype-postscript' => 'MediaObject',
-                'documenttype-presentation' => 'MediaObject',
-                'documenttype-spreadsheet' => 'MediaObject',
+                'documenttype-illustrator' => 'DigitalDocument',
+                'documenttype-image' => 'Photograph',
+                'documenttype-office_text' => 'DigitalDocument',
+                'documenttype-pdf' => 'DigitalDocument',
+                'documenttype-postscript' => 'DigitalDocument',
+                'documenttype-presentation' => 'DigitalDocument',
+                'documenttype-spreadsheet' => 'DigitalDocument',
                 'documenttype-story' => 'Article',
                 'documenttype-text' => 'Article',
-                'documenttype-video' => 'VideoObject'
+                'documenttype-video' => 'Clip'
             ];
         
         if (isset($this->params[ 'data' ][ 'fields' ][ 'Type' ][ 0 ][ '_id' ]))
@@ -246,42 +246,42 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         }
         
         // Files
+        // TODO: Implement file variants
+
+        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ]))
+        {
+            $thumbnails = [ ];
+            
+            foreach ([ 'thumbnail', 'layout', 'minihires', 'webm', 'mp4' ] as $file_type)
+            {
+                if (! isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ $file_type ]))
+                {
+                    continue;
+                }
+                
+                $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ $file_type ];
+                $file_id = $data[ 'files' ][ $key ][ '_id' ];
+                
+                $thumbnails[ ] = $this->fileToMediaObject($data[ '_referenced' ][ 'dcx:file' ][ $file_id ]);
+            }
+            
+            if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'original' ]))
+            {
+                $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'original' ];
+                $file_id = $data[ 'files' ][ $key ][ '_id' ];
+
+                $media_object = $this->fileToMediaObject($data[ '_referenced' ][ 'dcx:file' ][ $file_id ]);
+                
+                $media_object[ 'thumbnail' ] = $thumbnails;
+
+                $result[ 'associatedMedia' ] = [ $media_object ];
+            }
+            else
+            {
+                $result[ 'thumbnail' ] = $thumbnails;
+            }
+        }
         
-        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'thumbnail' ]))
-        {
-            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'thumbnail' ];
-            $file_id = $data[ 'files' ][ $key ][ '_id' ];
-
-            $result[ 'image' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
-        }
-
-        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'layout' ]))
-        {
-            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'layout' ];
-            $file_id = $data[ 'files' ][ $key ][ '_id' ];
-
-            // TODO: Should this be wrapped in a contentUrl?
-            $result[ 'digicol:previewImage' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
-        }
-
-        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'webm' ]))
-        {
-            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'webm' ];
-            $file_id = $data[ 'files' ][ $key ][ '_id' ];
-
-            // TODO: Should this be wrapped in a contentUrl?
-            $result[ 'digicol:previewVideoWebM' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
-        }
-
-        if (isset($data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'mp4' ]))
-        {
-            $key = $data[ '_files_index' ][ 'variant_type' ][ 'master' ][ 'mp4' ];
-            $file_id = $data[ 'files' ][ $key ][ '_id' ];
-
-            // TODO: Should this be wrapped in a contentUrl?
-            $result[ 'digicol:previewVideoMp4' ] = [ [ '@id' => $data[ '_referenced' ][ 'dcx:file' ][ $file_id ][ 'properties' ][ '_file_url' ] ] ];
-        }
-
         // Highlighting
         
         if (isset($data['_highlighting']))
@@ -365,7 +365,7 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                         'properties' => '*',
                         'fields' => '*',
                         'files' => '*',
-                        '_referenced' => [ 'dcx:file' => [ 's' => [ 'properties' => '*' ] ] ]
+                        '_referenced' => [ 'dcx:file' => [ 's' => [ 'properties' => '*', 'info' => '*' ] ] ]
                     ]
             ],
             $api_obj,
@@ -373,5 +373,59 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         );
         
         return $ok;
+    }
+
+
+    /**
+     * Get media object array
+     * 
+     * @param array $file
+     * @return array
+     */
+    protected function fileToMediaObject(array $file)
+    {
+        $result = 
+            [
+                '@type' => $this->getMediaObjectType($file[ 'properties' ][ 'mimetype' ]),
+                'contentUrl' => $file[ 'properties' ][ '_file_url' ],
+                'contentSize' => $file[ 'properties' ][ 'size' ]
+            ];
+
+        if (! empty($file[ 'info' ][ 'ImageWidth' ]))
+        {
+            $result[ 'width' ] = intval($file[ 'info' ][ 'ImageWidth' ]); 
+        }
+
+        if (! empty($file[ 'info' ][ 'ImageHeight' ]))
+        {
+            $result[ 'height' ] = intval($file[ 'info' ][ 'ImageHeight' ]);
+        }
+        
+        return $result;
+    }
+
+
+    /**
+     * Get file media object type
+     *
+     * @return string schema.org type like "ImageObject" or "VideoObject"
+     */
+    protected function getMediaObjectType($mediatype)
+    {
+        list($type, ) = explode('/', $mediatype);
+
+        $type_map =
+            [
+                'image' => 'ImageObject',
+                'video' => 'VideoObject',
+                'audio' => 'AudioObject'
+            ];
+
+        if (isset($type_map[ $type ]))
+        {
+            return $type_map[ $type ];
+        }
+
+        return 'MediaObject';
     }
 }
