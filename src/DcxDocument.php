@@ -388,7 +388,8 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
             [
                 '@type' => $this->getMediaObjectType($file[ 'properties' ][ 'mimetype' ]),
                 'contentUrl' => $file[ 'properties' ][ '_file_url' ],
-                'contentSize' => $file[ 'properties' ][ 'size' ]
+                'contentSize' => $file[ 'properties' ][ 'size' ],
+                'fileFormat' => $file[ 'properties' ][ 'mimetype' ]
             ];
 
         if (! empty($file[ 'info' ][ 'ImageWidth' ]))
