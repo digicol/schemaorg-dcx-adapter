@@ -168,18 +168,28 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
 
         $map_tags = 
             [
-                'Creator' => 'creator'
+                'Creator' => [ 'property' => 'creator' ],
+                'URI' => [ 'property' => 'url', 'datatype' => 'URL' ]
             ];
         
-        foreach ($map_tags as $tagdef => $property)
+        foreach ($map_tags as $tagdef => $map_config)
         {
+            $property = $map_config[ 'property' ];
+
             if (! empty($data[ 'fields' ][ $tagdef ][ 0 ][ 'value' ]))
             {
                 $result[ $property ] = [ ];
 
                 foreach ($data[ 'fields' ][ $tagdef ] as $value)
                 {
-                    $result[ $property ][ ] = [ '@value' => $value[ 'value' ] ];
+                    $property_value = [ '@value' => $value[ 'value' ] ];
+
+                    if (! empty($map_config[ 'datatype' ]))
+                    {
+                        $property_value[ '@type' ] = $map_config[ 'datatype' ];
+                    }
+
+                    $result[ $property ][ ] = $property_value;
                 }
             }
         }
