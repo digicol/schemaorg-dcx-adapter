@@ -402,6 +402,11 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
                 'fileFormat' => $file[ 'properties' ][ 'mimetype' ]
             ];
 
+        if (! empty($file[ 'properties' ][ 'displayname' ]))
+        {
+            $result[ 'name' ] = $file[ 'properties' ][ 'displayname' ]; 
+        }
+        
         if (! empty($file[ 'info' ][ 'ImageWidth' ]))
         {
             $result[ 'width' ] = intval($file[ 'info' ][ 'ImageWidth' ]); 
