@@ -1,12 +1,25 @@
 {
-    "require":
-    {
-        "digicol/schemaorg-sdk": "dev-master"
-    },
+    "name": "digicol/schemaorg-dcx-adapter",
+    "description": "Digital Collections schema.org DC-X content source adapter",
+    "minimum-stability": "dev",
+    "license": "proprietary",
+    "homepage": "http://ww.digicol.de/",
+    "authors":
+    [
+        {
+            "name": "Digital Collections Verlagsgesellschaft mbH",
+            "email": "dev@digicol.com",
+            "role" : "Developer"
+        }
+    ],
     "repositories": [
         {
             "type": "vcs",
             "url": "https://github.com/digicol/schemaorg-sdk"
         }
-    ]
+    ],
+    "require":
+    {
+        "digicol/schemaorg-sdk": "dev-master"
+    }
 }

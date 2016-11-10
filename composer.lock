@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e8c01648b88dc715fbc4c74d81df65b2",
-    "content-hash": "ca916ca7c72babce886083a265066b1b",
+    "hash": "d0d631f03a3d21854a059991e94a8429",
+    "content-hash": "6227318c193d89d121a569c89e600df3",
     "packages": [
         {
             "name": "digicol/schemaorg-sdk",
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digicol/schemaorg-sdk.git",
-                "reference": "29b8d2bf4d906b33bd6f557dd9c30fcbd0d289f9"
+                "reference": "67335c8d51e601e2aa07cd572b495fc80b6b314f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digicol/schemaorg-sdk/zipball/29b8d2bf4d906b33bd6f557dd9c30fcbd0d289f9",
-                "reference": "29b8d2bf4d906b33bd6f557dd9c30fcbd0d289f9",
+                "url": "https://api.github.com/repos/digicol/schemaorg-sdk/zipball/67335c8d51e601e2aa07cd572b495fc80b6b314f",
+                "reference": "67335c8d51e601e2aa07cd572b495fc80b6b314f",
                 "shasum": ""
             },
             "require": {
@@ -49,12 +49,12 @@
                 "source": "https://github.com/digicol/schemaorg-sdk/tree/master",
                 "issues": "https://github.com/digicol/schemaorg-sdk/issues"
             },
-            "time": "2016-10-17 13:37:36"
+            "time": "2016-10-20 09:00:28"
         }
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "digicol/schemaorg-sdk": 20
     },
