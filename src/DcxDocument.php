@@ -2,8 +2,11 @@
 
 namespace Digicol\SchemaOrg\Dcx;
 
+use Digicol\SchemaOrg\Sdk\ThingInterface;
+use Digicol\SchemaOrg\Sdk\Utils;
 
-class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
+
+class DcxDocument implements ThingInterface
 {
     /** @var DcxAdapter */
     protected $adapter;
@@ -97,7 +100,7 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
         
         $result =
             [
-                '@context' => \Digicol\SchemaOrg\Utils::getNamespaceContext(),
+                '@context' => Utils::getNamespaceContext(),
                 '@type' => $this->getType(),
                 'name' => [ [ '@value' => $data[ 'fields' ][ '_display_title' ][ 0 ][ 'value' ] ] ],
                 'sameAs' => [ [ '@id' => $data[ '_id' ] ] ]
@@ -310,7 +313,7 @@ class DcxDocument implements \Digicol\SchemaOrg\ThingInterface
      */
     public function getReconciledProperties(array $properties)
     {
-        $result = \Digicol\SchemaOrg\Utils::reconcileThingProperties
+        $result = Utils::reconcileThingProperties
         (
             $this->getType(),
             $properties

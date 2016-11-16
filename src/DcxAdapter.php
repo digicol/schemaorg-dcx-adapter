@@ -2,8 +2,11 @@
 
 namespace Digicol\SchemaOrg\Dcx;
 
+use Digicol\SchemaOrg\Sdk\AdapterInterface;
+use Digicol\SchemaOrg\Sdk\PotentialSearchActionInterface;
 
-class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
+
+class DcxAdapter implements AdapterInterface 
 {
     /** @var array */
     protected $params = [ ];
@@ -39,8 +42,10 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
     }
 
 
-    /** @return array */
-    public function describeSearchActions()
+    /** 
+     * @return PotentialSearchActionInterface[]
+     */
+    public function getPotentialSearchActions()
     {
         $result = [ ];
 
@@ -106,16 +111,6 @@ class DcxAdapter implements \Digicol\SchemaOrg\AdapterInterface
     }
     
     
-    /**
-     * @param array $search_params
-     * @return DcxSearchAction
-     */
-    public function newSearchAction(array $search_params)
-    {
-        return new DcxSearchAction($this, $search_params);
-    }
-
-
     /**
      * @param string $uri sameAs identifying URL
      * @return DcxDocument

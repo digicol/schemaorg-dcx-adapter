@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tim
- * Date: 13.07.16
- * Time: 10:14
- */
 
 namespace Digicol\SchemaOrg\Dcx;
 
