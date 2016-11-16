@@ -3,7 +3,7 @@
     "description": "Digital Collections schema.org DC-X content source adapter",
     "minimum-stability": "dev",
     "license": "proprietary",
-    "homepage": "http://ww.digicol.de/",
+    "homepage": "http://www.digicol.de/",
     "authors":
     [
         {
@@ -21,5 +21,12 @@
     "require":
     {
         "digicol/schemaorg-sdk": "dev-master"
+    },
+    "autoload":
+    {
+        "psr-4" :
+        {
+            "Digicol\\SchemaOrg\\Dcx\\": "src/"
+        }
     }
 }
