@@ -54,7 +54,7 @@ class DcxAdapter implements AdapterInterface
         // TODO: Use DCX_Api navigation page instead
 
         $permitted_channel_ids = $this->app->user->getChannelsByPermDef('dcx_channel.show_in_menu');
-
+        
         if (! is_array($permitted_channel_ids))
         {
             return $result;
@@ -80,7 +80,9 @@ class DcxAdapter implements AdapterInterface
                 $order = 0;
             }
 
-            $result[ $dcx_channel->getId() ] =
+            $result[ $dcx_channel->getId() ] = new DcxPotentialSearchAction
+            (
+                $this, 
                 [
                     'name' => $dcx_channel->getLabel(),
                     'description' => $dcx_channel->getRemark(),
@@ -88,7 +90,8 @@ class DcxAdapter implements AdapterInterface
                     'type' => 'channel',
                     'id' => $dcx_channel->getId(),
                     'searchform' => $searchform
-                ];
+                ]
+            );
         }
 
         uasort($result, [ $this, 'channelSortCallback' ]);
@@ -97,8 +100,11 @@ class DcxAdapter implements AdapterInterface
     }
 
 
-    public function channelSortCallback($a, $b)
+    public function channelSortCallback(DcxPotentialSearchAction $a, DcxPotentialSearchAction $b)
     {
+        $a = $a->getParams();
+        $b = $b->getParams();
+        
         $a = $a['order'];
         $b = $b['order'];
 

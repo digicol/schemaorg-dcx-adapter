@@ -11,6 +11,10 @@ use Digicol\SchemaOrg\Sdk\Utils;
 
 class DcxItemList extends AbstractItemList implements ItemListInterface 
 {
+    /** @var DcxAdapter */
+    protected $adapter;
+
+    
     /**
      * @param array $params
      */
@@ -25,6 +29,7 @@ class DcxItemList extends AbstractItemList implements ItemListInterface
     protected function prepareItems()
     {
         $this->items = [ ];
+        $this->output_properties[ 'numberOfItems' ] = 0;
         
         $response = $this->params[ 'search_response' ];
         
@@ -33,34 +38,22 @@ class DcxItemList extends AbstractItemList implements ItemListInterface
             return;
         }
 
-        if (is_array($this->search_response) && isset($this->search_response['totalResults']))
-        {
-            $total_results = $this->search_response['totalResults'];
-        }
-        else
-        {
-            $total_results = 0;
-        }
+        $this->output_properties[ 'opensearch:startIndex' ] = $response['startIndex'];
+        $this->output_properties[ 'opensearch:itemsPerPage' ] = $response['itemsPerPage'];
+        $this->output_properties[ 'numberOfItems' ] = $response['totalResults'];
 
-        $result['result']['numberOfItems'] = $total_results;
-        $result['result']['opensearch:itemsPerPage'] = Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE);
-        $result['result']['opensearch:startIndex'] = Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE);
-
-        foreach ($this->search_response['entries'] as $i => $entry_data)
+        if (isset($response['_available_filters']))
         {
-            $result['result']['itemListElement'][] =
-                [
-                    '@type' => 'ListItem',
-                    'position' => ($i + 1),
-                    'item' => new DcxDocument($this->adapter, [ 'data' => $entry_data ])
-                ];
+            $this->output_properties['dcx:_available_filters'] = $response['_available_filters'];
         }
 
-        if (isset($this->search_response['_available_filters']))
+        foreach ($response['entries'] as $i => $entry_data)
         {
-            $result['dcx:_available_filters'] = $this->search_response['_available_filters'];
+            $this->items[ ] = new DcxDocument
+            (
+                $this->getAdapter(),
+                [ 'data' => $entry_data ]
+            );
         }
-
-        return $result;
     }
 }

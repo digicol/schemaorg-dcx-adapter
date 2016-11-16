@@ -33,9 +33,9 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
                     ],
                 'query' =>
                     [
-                        'channel' => [ $this->params['id'] ],
+                        'channel' => [ $this->getPotentialSearchAction()->getParam('id') ],
                         '_limit' => Utils::getItemsPerPage($this->input_properties, self::DEFAULT_PAGESIZE),
-                        '_offset' => (Utils::getStartIndex($this->input_properties, self::DEFAULT_PAGESIZE) - 1)
+                        '_offset' => (Utils::getStartIndex($this->input_properties) - 1)
                     ]
             ];
 
@@ -67,7 +67,7 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
             $api_obj,
             $search_response
         );
-
+        
         return new DcxItemList($this->getAdapter(), $this, [ 'search_response' => $search_response ]);
     }
 }

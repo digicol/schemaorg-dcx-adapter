@@ -2,25 +2,16 @@
 
 namespace Digicol\SchemaOrg\Dcx;
 
+use Digicol\SchemaOrg\Sdk\AbstractThing;
 use Digicol\SchemaOrg\Sdk\ThingInterface;
 use Digicol\SchemaOrg\Sdk\Utils;
 
 
-class DcxDocument implements ThingInterface
+class DcxDocument extends AbstractThing implements ThingInterface
 {
     /** @var DcxAdapter */
     protected $adapter;
-
-    /** @var array $params */
-    protected $params = [ ];
-
-
-    public function __construct(DcxAdapter $adapter, array $params)
-    {
-        $this->adapter = $adapter;
-        $this->params = $params;
-    }
-
+    
 
     /**
      * Get identifier URI
