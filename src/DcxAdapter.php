@@ -123,6 +123,7 @@ class DcxAdapter implements AdapterInterface
      */
     public function newThing($uri)
     {
+        // ToDo: Check whether $uri begins with "document/" or some other supported object type
         return new DcxDocument($this, [ 'sameAs' => $uri ]);
     }
 
