@@ -15,7 +15,7 @@ class DcxAdapter implements AdapterInterface
     protected $app;
 
     /** @var \DCX_Api */
-    protected $dcx_api;
+    protected $dcxApi;
 
 
     /**
@@ -49,7 +49,7 @@ class DcxAdapter implements AdapterInterface
     {
         $result = [];
 
-        $dcx_api = $this->newDcxApi();
+        $dcxApi = $this->newDcxApi();
 
         // TODO: Use DCX_Api navigation page instead
 
@@ -68,7 +68,7 @@ class DcxAdapter implements AdapterInterface
                 continue;
             }
 
-            $dcx_api->getPage('searchform', $searchform);
+            $dcxApi->getPage('searchform', $searchform);
 
             $order = $this->app->cache->getConfigValue('dcx_channel.order', $channel_id);
 
@@ -128,12 +128,12 @@ class DcxAdapter implements AdapterInterface
      */
     public function newDcxApi()
     {
-        if (! is_object($this->dcx_api)) {
+        if (! is_object($this->dcxApi)) {
             $this->initDcx();
-            $this->dcx_api = new \DCX_Api($this->app);
+            $this->dcxApi = new \DCX_Api($this->app);
         }
 
-        return $this->dcx_api;
+        return $this->dcxApi;
     }
 
 
