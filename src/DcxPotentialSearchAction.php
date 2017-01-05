@@ -12,7 +12,7 @@ class DcxPotentialSearchAction extends AbstractPotentialSearchAction implements 
     /** @return array */
     public function describeInputProperties()
     {
-        return [ ];
+        return [];
     }
 
 
@@ -21,6 +21,6 @@ class DcxPotentialSearchAction extends AbstractPotentialSearchAction implements 
      */
     public function newSearchAction()
     {
-        return new DcxSearchAction($this->getAdapter(), $this, [ ]);
+        return new DcxSearchAction($this->getAdapter(), $this, []);
     }
 }

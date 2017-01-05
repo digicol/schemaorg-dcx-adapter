@@ -2,8 +2,8 @@
 
 namespace Digicol\SchemaOrg\Dcx;
 
-
 use Symfony\Component\Security\Core\User\UserInterface;
+
 
 class DcxUser implements UserInterface
 {
@@ -11,6 +11,7 @@ class DcxUser implements UserInterface
     protected $password;
     protected $displayname;
     protected $roles;
+
 
     /**
      * @return mixed
@@ -20,6 +21,7 @@ class DcxUser implements UserInterface
         return $this->password;
     }
 
+
     /**
      * @return mixed
      */
@@ -28,50 +30,59 @@ class DcxUser implements UserInterface
         return $this->roles;
     }
 
-    public function load(\DCX_User $dcxuser )
+
+    public function load(\DCX_User $dcxuser)
     {
-        if ($dcxuser->getDn() === false)
-        {
+        if ($dcxuser->getDn() === false) {
             return -1;
         }
+
         $this->username = $dcxuser->getDn();
         $this->displayname = $dcxuser->getDisplayName();
-        $this->roles = array();
+        $this->roles = [];
+
         return 1;
     }
+
 
     public function getUserId()
     {
         return $this->userid;
     }
 
+
     public function getDisplayName()
     {
         return $this->displayname;
     }
 
-    public function matchPassword( $password )
+
+    public function matchPassword($password)
     {
         return true;
     }
 
-    public function hasrole( $role )
+
+    public function hasrole($role)
     {
         return true;
     }
+
 
     public function getSalt()
     {
         return 'salt';
     }
 
+
     public function getUsername()
     {
         return $this->displayname;
     }
 
+
     public function eraseCredentials()
     {
-      $this->password = '';
+        $this->password = '';
     }
 }

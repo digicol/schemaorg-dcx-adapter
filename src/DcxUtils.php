@@ -13,28 +13,37 @@ class DcxUtils
      */
     public static function stripTagsReplaceCallback($matches)
     {
-        static $add_no_space_for = array
-        (
-            'a', 'b', 'del', 'em', 'i', 'ins', 'mark', 'span', 'strike', 'strong',
-            'sub', 'sup', 'u'
-        );
+        static $addNoSpaceFor = [
+            'a',
+            'b',
+            'del',
+            'em',
+            'i',
+            'ins',
+            'mark',
+            'span',
+            'strike',
+            'strong',
+            'sub',
+            'sup',
+            'u'
+        ];
 
         // <span class="x"> => span
 
-        $parts = explode(' ', trim(strtr($matches[ 1 ], array( '<' => '', '>' => '', '/' => '' ))));
+        $parts = explode(' ', trim(strtr($matches[1], ['<' => '', '>' => '', '/' => ''])));
 
-        $tag = $parts[ 0 ];
+        $tag = $parts[0];
 
-        $result = $matches[ 0 ];
+        $result = $matches[0];
 
-        if (! in_array($tag, $add_no_space_for))
-        {
+        if (! in_array($tag, $addNoSpaceFor)) {
             $result .= ' ';
         }
 
         return $result;
     }
-    
+
 
     /**
      * A copy of DCX_HtmlUtils::toStructuredPlainText()
@@ -44,8 +53,7 @@ class DcxUtils
      */
     public static function toPlainText($html)
     {
-        if (trim($html) === '')
-        {
+        if (trim($html) === '') {
             return '';
         }
 
@@ -70,18 +78,15 @@ class DcxUtils
 
         return html_entity_decode($html, ENT_QUOTES, 'UTF-8');
     }
-    
-    
+
+
     public static function isValidIso8601($iso8601str)
     {
         // The string should parse into a valid date... 
 
-        try
-        {
-            $dummy = new \DateTime($iso8601str);
-        }
-        catch (\Exception $e)
-        {
+        try {
+            new \DateTime($iso8601str);
+        } catch (\Exception $e) {
             return false;
         }
 
