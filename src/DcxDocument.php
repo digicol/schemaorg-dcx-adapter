@@ -76,8 +76,12 @@ class DcxDocument extends AbstractThing implements ThingInterface
      */
     public function getProperties()
     {
-        // TODO: Add error handling
-        $this->load();
+        $ok = $this->load();
+
+        // TODO: Improve error handling
+        if ($ok < 0) {
+            return [];
+        }
 
         $data = $this->params['data'];
 
