@@ -54,7 +54,7 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
         if (! empty($this->inputProperties['dcx:request_highlighting'])) {
             $params['query']['request_highlighting'] = $this->inputProperties['dcx:request_highlighting'];
         }
-
+        
         $dcxApi = $this->adapter->newDcxApi();
 
         $ok = $dcxApi->getObjects
@@ -63,7 +63,7 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
             $apiObj,
             $searchResponse
         );
-
+        
         return new DcxItemList($this->getAdapter(), $this, ['search_response' => $searchResponse]);
     }
 }
