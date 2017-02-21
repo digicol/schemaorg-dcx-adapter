@@ -20,7 +20,8 @@
     ],
     "require":
     {
-        "digicol/schemaorg-sdk": "dev-master"
+        "digicol/schemaorg-sdk": "dev-master",
+        "guzzlehttp/guzzle": "~6.0"
     },
     "autoload":
     {
