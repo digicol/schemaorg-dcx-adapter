@@ -316,15 +316,12 @@ class DcxDocument extends AbstractThing implements ThingInterface
 
     protected function loadDetails($uri)
     {
-        $dcxApi = $this->adapter->newDcxApi();
+        $dcxApiClient = $this->adapter->newDcxApiClient();
 
-        $dcxApi->urlToObjectId($uri, $objectType, $objectId);
-
-        $ok = $dcxApi->getObject
+        $result = $dcxApiClient->get
         (
+            $uri,
             [
-                'object_type' => $objectType,
-                'object_id' => $objectId,
                 's' =>
                     [
                         'properties' => '*',
@@ -333,11 +330,10 @@ class DcxDocument extends AbstractThing implements ThingInterface
                         '_referenced' => ['dcx:file' => ['s' => ['properties' => '*', 'info' => '*']]]
                     ]
             ],
-            $apiObj,
             $this->params['data']
         );
 
-        return $ok;
+        return $result;
     }
 
 

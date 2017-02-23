@@ -2,6 +2,7 @@
 
 namespace Digicol\SchemaOrg\Dcx;
 
+use Digicol\DcxSdk\DcxApiClient;
 use Digicol\SchemaOrg\Sdk\AdapterInterface;
 use Digicol\SchemaOrg\Sdk\PotentialSearchActionInterface;
 
@@ -11,11 +12,8 @@ class DcxAdapter implements AdapterInterface
     /** @var array */
     protected $params = [];
 
-    /** @var \DCX_Application */
-    protected $app;
-
-    /** @var \DCX_Api */
-    protected $dcxApi;
+    /** @var DcxApiClient */
+    protected $dcxApiClient;
 
 
     /**
@@ -30,15 +28,7 @@ class DcxAdapter implements AdapterInterface
     /** @return array */
     public function getParams()
     {
-        $this->initDcx();
-
-        $result = $this->params;
-
-        $result['logged_in'] = $this->app->isLoggedIn();
-        $result['login_url_pattern'] = $this->app->base_url . 'login?redirect=%s';
-        $result['logout_url_pattern'] = $this->app->base_url . 'login?logout=1&redirect=%s';
-
-        return $result;
+        return $this->params;
     }
 
 
@@ -47,68 +37,36 @@ class DcxAdapter implements AdapterInterface
      */
     public function getPotentialSearchActions()
     {
-        $result = [];
+        $dcxApiClient = $this->newDcxApiClient();
 
-        $dcxApi = $this->newDcxApi();
-
-        // TODO: Use DCX_Api navigation page instead
-
-        $permitted_channel_ids = $this->app->user->getChannelsByPermDef('dcx_channel.show_in_menu');
-
-        if (! is_array($permitted_channel_ids)) {
-            return $result;
+        $httpStatus = $dcxApiClient->get(
+            'channel/?q[_mode]=my_channels',
+            [],
+            $data
+        );
+        
+        if (($httpStatus >= 300) || empty($data['entries'])) {
+            return [];
         }
 
-        $dcx_channel = new \DCX_Channel($this->app);
+        $result = [];
 
-        foreach ($permitted_channel_ids as $channel_id) {
-            $ok = $dcx_channel->load($channel_id);
-
-            if ($ok < 0) {
-                continue;
-            }
-
-            $dcxApi->getPage('searchform', $searchform);
-
-            $order = $this->app->cache->getConfigValue('dcx_channel.order', $channel_id);
-
-            if (! is_numeric($order)) {
-                $order = 0;
-            }
-
-            $result[$dcx_channel->getId()] = new DcxPotentialSearchAction
+        foreach ($data['entries'] as $channelData) {
+            $channelId = basename($channelData['_id']);
+            
+            $result[$channelId] = new DcxPotentialSearchAction
             (
                 $this,
                 [
-                    'name' => $dcx_channel->getLabel(),
-                    'description' => $dcx_channel->getRemark(),
-                    'order' => $order,
+                    'name' => $channelData['properties']['_label'],
+                    'description' => (! empty($channelData['properties']['remark']) ? $channelData['properties']['remark'] : ''),
                     'type' => 'channel',
-                    'id' => $dcx_channel->getId(),
-                    'searchform' => $searchform
+                    'id' => $channelId
                 ]
             );
         }
 
-        uasort($result, [$this, 'channelSortCallback']);
-
         return $result;
-    }
-
-
-    public function channelSortCallback(DcxPotentialSearchAction $a, DcxPotentialSearchAction $b)
-    {
-        $a = $a->getParams();
-        $b = $b->getParams();
-
-        $a = $a['order'];
-        $b = $b['order'];
-
-        if ($a === $b) {
-            return 0;
-        }
-
-        return ($a > $b ? 1 : -1);
     }
 
 
@@ -124,32 +82,25 @@ class DcxAdapter implements AdapterInterface
 
 
     /**
-     * @return \DCX_Api
+     * @return DcxApiClient
      */
-    public function newDcxApi()
+    public function newDcxApiClient()
     {
-        if (! is_object($this->dcxApi)) {
-            $this->initDcx();
-            $this->dcxApi = new \DCX_Api($this->app);
+        if (! is_object($this->dcxApiClient)) {
+            $params = [];
+
+            if (! empty($this->params['http_useragent'])) {
+                $params['http_useragent'] = $this->params['http_useragent'];
+            }
+
+            $this->dcxApiClient = new DcxApiClient
+            (
+                $this->params['url'],
+                $this->params['credentials'],
+                $params
+            );
         }
 
-        return $this->dcxApi;
-    }
-
-
-    protected function initDcx()
-    {
-        global $app;
-
-        if (is_object($this->app)) {
-            return;
-        }
-
-        putenv('DC_CONFIGDIR=' . $this->params['dc_configdir']);
-        putenv('DC_APP=' . $this->params['dc_app']);
-
-        require_once $this->params['dc_systemdir'] . '/include/init.inc.php';
-
-        $this->app = $app;
+        return $this->dcxApiClient;
     }
 }

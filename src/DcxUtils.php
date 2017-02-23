@@ -60,7 +60,7 @@ class DcxUtils
         $html = str_replace('&apos;', "'", $html);
 
         $regex = '/(<.*?>)/';
-        $html = preg_replace_callback($regex, 'DCX_HtmlUtils::stripTagsReplaceCallback', $html);
+        $html = preg_replace_callback($regex, 'Digicol\SchemaOrg\Dcx\DcxUtils::stripTagsReplaceCallback', $html);
 
         $html = trim(preg_replace('/[[:space:]]+/s', ' ', strip_tags($html, '<p><br><div>')));
 
@@ -79,7 +79,7 @@ class DcxUtils
         return html_entity_decode($html, ENT_QUOTES, 'UTF-8');
     }
 
-
+    
     public static function isValidIso8601($iso8601str)
     {
         // The string should parse into a valid date... 

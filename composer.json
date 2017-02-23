@@ -16,11 +16,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/digicol/schemaorg-sdk"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/digicol/dcx-sdk-php"
         }
     ],
     "require":
     {
         "digicol/schemaorg-sdk": "dev-master",
+        "digicol/dcx-sdk-php": "dev-master",
         "guzzlehttp/guzzle": "~6.0"
     },
     "autoload":

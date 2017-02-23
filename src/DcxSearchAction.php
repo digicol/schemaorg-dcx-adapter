@@ -23,7 +23,6 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
     {
         $params =
             [
-                'object_type' => 'document',
                 's' =>
                     [
                         'properties' => '*',
@@ -31,7 +30,7 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
                         'files' => '*',
                         '_referenced' => ['dcx:file' => ['s' => ['properties' => '*']]]
                     ],
-                'query' =>
+                'q' =>
                     [
                         'channel' => [$this->getPotentialSearchAction()->getParam('id')],
                         '_limit' => Utils::getItemsPerPage($this->inputProperties, self::DEFAULT_PAGESIZE),
@@ -54,13 +53,13 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
         if (! empty($this->inputProperties['dcx:request_highlighting'])) {
             $params['query']['request_highlighting'] = $this->inputProperties['dcx:request_highlighting'];
         }
-        
-        $dcxApi = $this->adapter->newDcxApi();
 
-        $ok = $dcxApi->getObjects
+        $dcxApiClient = $this->adapter->newDcxApiClient();
+
+        $dcxApiClient->get
         (
+            'document',
             $params,
-            $apiObj,
             $searchResponse
         );
         
