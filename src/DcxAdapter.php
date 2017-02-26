@@ -5,6 +5,8 @@ namespace Digicol\SchemaOrg\Dcx;
 use Digicol\DcxSdk\DcxApiClient;
 use Digicol\SchemaOrg\Sdk\AdapterInterface;
 use Digicol\SchemaOrg\Sdk\PotentialSearchActionInterface;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\CookieJarInterface;
 
 
 class DcxAdapter implements AdapterInterface
@@ -14,6 +16,9 @@ class DcxAdapter implements AdapterInterface
 
     /** @var DcxApiClient */
     protected $dcxApiClient;
+    
+    /** @var CookieJarInterface */
+    protected $cookieJar;
 
 
     /**
@@ -22,6 +27,7 @@ class DcxAdapter implements AdapterInterface
     public function __construct(array $params)
     {
         $this->params = $params;
+        $this->cookieJar = new CookieJar();
     }
 
 
@@ -82,6 +88,24 @@ class DcxAdapter implements AdapterInterface
 
 
     /**
+     * @return CookieJarInterface
+     */
+    public function getCookieJar()
+    {
+        return $this->cookieJar;
+    }
+
+
+    /**
+     * @param CookieJarInterface $cookieJar
+     */
+    public function setCookieJar(CookieJarInterface $cookieJar)
+    {
+        $this->cookieJar = $cookieJar;
+    }
+
+
+    /**
      * @return DcxApiClient
      */
     public function newDcxApiClient()
@@ -99,6 +123,10 @@ class DcxAdapter implements AdapterInterface
                 $this->params['credentials'],
                 $params
             );
+            
+            if (is_object($this->cookieJar)) {
+                $this->dcxApiClient->setCookieJar($this->cookieJar);
+            }
         }
 
         return $this->dcxApiClient;
