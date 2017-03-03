@@ -39,19 +39,19 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
             ];
 
         if (! empty($this->getQuery())) {
-            $params['query']['fulltext'] = [$this->getQuery()];
+            $params['q']['fulltext'] = [$this->getQuery()];
         }
 
         if (isset($this->inputProperties['dcx:filters']) && is_array($this->inputProperties['dcx:filters'])) {
-            $params['query']['filters'] = $this->inputProperties['dcx:filters'];
+            $params['q']['filters'] = $this->inputProperties['dcx:filters'];
         }
 
         if (! empty($this->inputProperties['dcx:request_filters'])) {
-            $params['query']['request_filters'] = $this->inputProperties['dcx:request_filters'];
+            $params['q']['request_filters'] = $this->inputProperties['dcx:request_filters'];
         }
 
         if (! empty($this->inputProperties['dcx:request_highlighting'])) {
-            $params['query']['request_highlighting'] = $this->inputProperties['dcx:request_highlighting'];
+            $params['q']['request_highlighting'] = $this->inputProperties['dcx:request_highlighting'];
         }
 
         $dcxApiClient = $this->adapter->newDcxApiClient();
