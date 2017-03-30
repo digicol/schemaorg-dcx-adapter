@@ -2,6 +2,7 @@
     "name": "digicol/schemaorg-dcx-adapter",
     "description": "Digital Collections schema.org DC-X content source adapter",
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "license": "proprietary",
     "homepage": "http://www.digicol.de/",
     "authors":
