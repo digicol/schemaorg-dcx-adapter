@@ -32,7 +32,7 @@ class DcxItemList extends AbstractItemList implements ItemListInterface
 
         $response = $this->params['search_response'];
 
-        if ((! is_array($response)) || (! isset($response['entries']))) {
+        if ((! is_array($response))) {
             return;
         }
 
@@ -44,12 +44,14 @@ class DcxItemList extends AbstractItemList implements ItemListInterface
             $this->outputProperties['dcx:_available_filters'] = $response['_available_filters'];
         }
 
-        foreach ($response['entries'] as $i => $entryData) {
-            $this->items[] = new DcxDocument
-            (
-                $this->getAdapter(),
-                ['data' => $entryData]
-            );
+        if (isset($response['entries'])) {
+            foreach ($response['entries'] as $i => $entryData) {
+                $this->items[] = new DcxDocument
+                (
+                    $this->getAdapter(),
+                    ['data' => $entryData]
+                );
+            }
         }
     }
 }
