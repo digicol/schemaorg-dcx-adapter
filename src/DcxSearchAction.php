@@ -5,6 +5,7 @@ namespace Digicol\SchemaOrg\Dcx;
 use Digicol\SchemaOrg\Sdk\AbstractSearchAction;
 use Digicol\SchemaOrg\Sdk\ItemListInterface;
 use Digicol\SchemaOrg\Sdk\SearchActionInterface;
+use Digicol\SchemaOrg\Sdk\StreamHandlerInterface;
 use Digicol\SchemaOrg\Sdk\Utils;
 
 
@@ -20,6 +21,58 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
      * @return ItemListInterface
      */
     public function getResult()
+    {
+        $dcxApiClient = $this->adapter->newDcxApiClient();
+
+        $dcxApiClient->get
+        (
+            'document',
+            $this->getApiParams(),
+            $searchResponse
+        );
+
+        return new DcxItemList($this->getAdapter(), $this, ['search_response' => $searchResponse]);
+    }
+
+
+    /**
+     * @param StreamHandlerInterface $streamHandler
+     * @return int
+     */
+    public function streamResult(StreamHandlerInterface $streamHandler)
+    {
+        /** @var DcxAdapter $adapter */
+        $adapter = $this->getAdapter();
+
+        $dcxApiClient = $adapter->newDcxApiClient();
+        $searchAction = $this;
+
+        $eventListener = function (array $event) use ($streamHandler, $adapter, $searchAction) {
+            if ($event['type'] === 'metadata') {
+                $streamHandler->onListMetadata(new DcxItemList($adapter, $searchAction,
+                    ['search_response' => $event['data']]));
+            } elseif ($event['type'] === 'entry') {
+                $streamHandler->onListItem(new DcxDocument($adapter, ['data' => $event['data']]));
+            } elseif ($event['type'] === 'close') {
+                $streamHandler->onComplete();
+            }
+        };
+
+        $dcxApiClient->stream
+        (
+            'document',
+            $this->getApiParams(),
+            $eventListener
+        );
+
+        return 1;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function getApiParams()
     {
         $params =
             [
@@ -54,15 +107,6 @@ class DcxSearchAction extends AbstractSearchAction implements SearchActionInterf
             $params['q']['request_highlighting'] = $this->inputProperties['dcx:request_highlighting'];
         }
 
-        $dcxApiClient = $this->adapter->newDcxApiClient();
-
-        $dcxApiClient->get
-        (
-            'document',
-            $params,
-            $searchResponse
-        );
-        
-        return new DcxItemList($this->getAdapter(), $this, ['search_response' => $searchResponse]);
+        return $params;
     }
 }
